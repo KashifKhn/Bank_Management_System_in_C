@@ -1,5 +1,6 @@
 #include <stdio.h>
-
+#include <conio.h>
+#include <unistd.h>
 
 struct ClientData
 {
@@ -9,11 +10,14 @@ struct ClientData
     double balance;
 };
 
-unsigned int enterChoice(void);
+void welcomeScreen(FILE *cfPtr);
+void showMenu(FILE *cfPtr);
 void textFile(FILE *readPtr);
 void updateRecord(FILE *fPtr);
 void newRecord(FILE *fPtr);
 void deleteRecord(FILE *fPtr);
+void clearScreen();
+void exitApp();
 
 int main()
 {
@@ -21,32 +25,67 @@ int main()
     if ((cfPtr = fopen("account.dat", "rb+")) == NULL)
         puts("File could not Opened");
     else 
-    {
-        unsigned int choice;
-        while ((choice = enterChoice()) != 5)
-        {
-            switch (choice)
-            {
-            case 1:
-                textFile(cfPtr);
-                break;
-            case 2:
-                updateRecord(cfPtr);
-                break;
-            case 3:
-                newRecord(cfPtr);
-                break;
-            case 4:
-                deleteRecord(cfPtr);
-                break;
-            default:
-                puts("Incorrect Choice");
-                break;
-            }
-        }
-        fclose(cfPtr);
-    }
+        welcomeScreen(cfPtr);
+}
 
+void welcomeScreen(FILE *cfPtr)
+{
+    clearScreen();
+    printf("\t\t###################################################\n");
+    printf("\t\t#                                                 #\n");
+    printf("\t\t#               -----------------------           #\n");
+    printf("\t\t#               -----------------------           #\n");
+    printf("\t\t#               |      Welcome To     |           #\n");
+    printf("\t\t#               |         The         |           #\n");
+    printf("\t\t#               |         Bank        |           #\n");
+    printf("\t\t#               -----------------------           #\n");
+    printf("\t\t#               -----------------------           #\n");
+    printf("\t\t#                                                 #\n");
+    printf("\t\t###################################################\n");
+    showMenu(cfPtr);
+}
+
+void showMenu(FILE *cfPtr)
+{
+    sleep(3);
+    clearScreen();
+    printf("\t\t################################################################\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#               -----------------------                        #\n");
+    printf("\t\t#               |      Bank Menu      |                        #\n");
+    printf("\t\t#               -----------------------                        #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                      Press                                   #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  1 Store a Formatted Text                #\n");
+    printf("\t\t#                        file of Account for Printing          #\n");
+    printf("\t\t#                 -->  2 Add New Account                       #\n");
+    printf("\t\t#                 -->  3 Update an Account                     #\n");
+    printf("\t\t#                 -->  4 Delet and Acccount                    #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  0 to exit the Program                   #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t################################################################\n");
+
+    char option;
+    printf("\t\t\t\t--->: ");
+    option = getch();
+    option -= 48;
+    printf("\n\n\n");
+    if (option == 1)
+        textFile(cfPtr);
+    else if (option == 2)
+        newRecord(cfPtr);
+    else if (option == 3)
+        updateRecord(cfPtr);
+    else if (option == 4)
+        deleteRecord(cfPtr);
+    else if (option == 0)
+        exitApp();
+    else
+        showMenu(cfPtr);
+    showMenu(cfPtr);
 }
 
 void textFile(FILE *readPtr)
@@ -153,16 +192,13 @@ void newRecord(FILE *fPtr)
     }
     
 }
-unsigned int enterChoice(void)
+
+void clearScreen()
 {
-    unsigned int menuChoice;
-    printf("%s", "\nEnter your choice\n"
-                "1 - store a formatted text file of accounts called\n"
-                "    \"accounts.txt\" for printing\n"
-                "2 - update an account\n"
-                "3 - add a new account\n"
-                "4 - delete an account\n"
-                "5 - end program\n? ");
-    scanf("%u", &menuChoice);
-    return menuChoice;
+    system("cls");
+}
+
+void exitApp()
+{
+    exit(0);
 }
