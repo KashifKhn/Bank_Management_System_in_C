@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <unistd.h>
+#include <string.h>
 
 struct ClientData
 {
@@ -14,8 +15,10 @@ void welcomeScreen(FILE *cfPtr);
 void showMenu(FILE *cfPtr);
 void textFile(FILE *readPtr);
 void updateRecord(FILE *fPtr);
+int updatRecordMenu(FILE *cfPtr);
 void newRecord(FILE *fPtr);
 void deleteRecord(FILE *fPtr);
+void viewAllRecord(FILE *fPtr);
 void clearScreen();
 void exitApp();
 
@@ -24,7 +27,7 @@ int main()
     FILE *cfPtr;
     if ((cfPtr = fopen("account.dat", "rb+")) == NULL)
         puts("File could not Opened");
-    else 
+    else
         welcomeScreen(cfPtr);
 }
 
@@ -42,12 +45,12 @@ void welcomeScreen(FILE *cfPtr)
     printf("\t\t#               -----------------------           #\n");
     printf("\t\t#                                                 #\n");
     printf("\t\t###################################################\n");
+    sleep(3);
     showMenu(cfPtr);
 }
 
 void showMenu(FILE *cfPtr)
 {
-    sleep(3);
     clearScreen();
     printf("\t\t################################################################\n");
     printf("\t\t#                                                              #\n");
@@ -62,6 +65,7 @@ void showMenu(FILE *cfPtr)
     printf("\t\t#                 -->  2 Add New Account                       #\n");
     printf("\t\t#                 -->  3 Update an Account                     #\n");
     printf("\t\t#                 -->  4 Delet and Acccount                    #\n");
+    printf("\t\t#                 -->  5 view all Acccounts Record             #\n");
     printf("\t\t#                                                              #\n");
     printf("\t\t#                 -->  0 to exit the Program                   #\n");
     printf("\t\t#                                                              #\n");
@@ -74,37 +78,68 @@ void showMenu(FILE *cfPtr)
     option -= 48;
     printf("\n\n\n");
     if (option == 1)
+    {
         textFile(cfPtr);
+        printf("\n\n\n\t\t\tUpload Compelet");
+        printf("\n\n\t\tPress any key to back to meu");
+        getch();
+    }
     else if (option == 2)
         newRecord(cfPtr);
     else if (option == 3)
         updateRecord(cfPtr);
     else if (option == 4)
         deleteRecord(cfPtr);
+    else if (option == 5)
+        viewAllRecord(cfPtr);
     else if (option == 0)
+    {
+        fclose(cfPtr);
         exitApp();
-    else
-        showMenu(cfPtr);
+    }
     showMenu(cfPtr);
+}
+
+void viewAllRecord(FILE *fPtr)
+{
+    textFile(fPtr);
+    FILE *viewPtr;
+    if ((viewPtr = fopen("account.dat", "rb")) == NULL)
+        puts("File could not Opened");
+    else
+    {
+        printf("%-10s%-19s%-19s%10.2s\n", "Acct", "Last Name", "First Name", "Balance");
+        while (!feof(viewPtr))
+        {
+            struct ClientData clinet = {0, "", "", 0.0};
+            int result = fread(&clinet, sizeof(struct ClientData), 1, viewPtr);
+
+            if (result != 0 && clinet.accountNumber != 0)
+                printf("%-10d%-19s%-19s%10.2f\n", clinet.accountNumber, clinet.lastName, clinet.firstName, clinet.balance);
+        }
+        fclose(viewPtr);
+    }
+    printf("\n\n\t\tPress any key to back to meu");
+    getch();
 }
 
 void textFile(FILE *readPtr)
 {
     FILE *writePtr;
 
-    if((writePtr = fopen("account.txt", "w")) == NULL)
+    if ((writePtr = fopen("account.txt", "w")) == NULL)
         puts("File could not Opened");
-    else 
+    else
     {
         rewind(readPtr);
-        fprintf(writePtr, "%-6s%-16s%-11s%10s\n", "Acct", "Last Name", "First Name", "Balance");
-        while(!feof(readPtr))
+        fprintf(writePtr, "%-10d%-19s%-19s%10.2f\n", "Acct", "Last Name", "First Name", "Balance");
+        while (!feof(readPtr))
         {
             struct ClientData clinet = {0, "", "", 0.0};
             int result = fread(&clinet, sizeof(struct ClientData), 1, readPtr);
 
-            if(result !=0 && clinet.accountNumber !=0)
-                fprintf(writePtr, "%-6d%-16s%-11s%10.2f\n", clinet.accountNumber, clinet.lastName, clinet.firstName, clinet.balance);
+            if (result != 0 && clinet.accountNumber != 0)
+                fprintf(writePtr, "%-10d%-19s%-19s%10.2f\n", clinet.accountNumber, clinet.lastName, clinet.firstName, clinet.balance);
         }
         fclose(writePtr);
     }
@@ -122,23 +157,90 @@ void updateRecord(FILE *fPtr)
 
     fread(&client, sizeof(struct ClientData), 1, fPtr);
 
-    if(client.accountNumber == 0)
-        printf("Account #%d has no information.\n", account);
-    else 
+    if (client.accountNumber == 0)
     {
-        printf("%-6d%-16s%-11s%10.2f\n\n", client.accountNumber, client.lastName, client.firstName, client.balance);
-
-        double transaction;
-        printf("%s", "Enter charge (+) or payment (-): ");
-        scanf("%lf", &transaction);
-        client.balance += transaction;
-
-        printf("%-6d%-16s%-11s%10.2f\n", client.accountNumber, client.lastName, client.firstName, client.balance);
-
-        fseek(fPtr, (account - 1) * sizeof(struct ClientData), SEEK_SET);
-
-        fwrite(&client, sizeof(struct ClientData), 1, fPtr);
+        printf("\n\t\tAccount #%d has no information.\n", account);
+        printf("\n\n\t\tPress any key to back to meu");
+        getch();
+        return;
     }
+    else
+    {
+        int option = updatRecordMenu(fPtr);
+        if (option == 1)
+        {
+            printf("%-10d%-19s%-19s%10.2f\n\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            char name[20];
+            printf("Please Enter the First Name again:  ");
+            scanf("%s", name);
+            // strcpy(client.firstName, name);
+            strcpy(client.lastName, name);
+            printf("%-10d%-19s%-19s%10.2f\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            fseek(fPtr, (account - 1) * sizeof(struct ClientData), SEEK_SET);
+            fwrite(&client, sizeof(struct ClientData), 1, fPtr);
+        }
+        else if (option == 2)
+        {
+            printf("%-10d%-19s%-19s%10.2f\n\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            char name[20];
+            printf("Please Enter the Last Name again:  ");
+            scanf("%s", name);
+            strcpy(client.firstName, name);
+            // strcpy(client.lastName, name);
+            printf("%-10d%-19s%-19s%10.2f\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            fseek(fPtr, (account - 1) * sizeof(struct ClientData), SEEK_SET);
+            fwrite(&client, sizeof(struct ClientData), 1, fPtr);
+        }
+        else if (option == 3)
+        {
+            printf("%-10d%-19s%-19s%10.2f\n\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            double transaction;
+            printf("%s", "Enter charge (+) or payment (-): ");
+            scanf("%lf", &transaction);
+            client.balance += transaction;
+            printf("%-10d%-19s%-19s%10.2f\n", client.accountNumber, client.lastName, client.firstName, client.balance);
+            fseek(fPtr, (account - 1) * sizeof(struct ClientData), SEEK_SET);
+            fwrite(&client, sizeof(struct ClientData), 1, fPtr);
+        }
+    }
+    printf("\n\n\n\t\t\tUpdate The Account successfully");
+    printf("\n\n\t\tPress any key to back to meu");
+    getch();
+}
+
+int updatRecordMenu(FILE *cfPtr)
+{
+    clearScreen();
+    printf("\t\t################################################################\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#               -----------------------                        #\n");
+    printf("\t\t#               |      Update Menu    |                        #\n");
+    printf("\t\t#               -----------------------                        #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                      Press                                   #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  1 Update First Name                     #\n");
+    printf("\t\t#                 -->  2 Update Last Name                      #\n");
+    printf("\t\t#                 -->  3 Update Balance                        #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  4 view all Acccounts Record             #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  0 to Bank Menu                          #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t################################################################\n");
+
+    char option;
+    printf("\t\t\t\t--->: ");
+    option = getch();
+    option -= 48;
+    printf("\n\n\n");
+    if (option >= 1 && option <= 3)
+        return (int)option;
+    else if (option == 4)
+        viewAllRecord(cfPtr);
+    else if (option == 0)
+        showMenu(cfPtr);
 }
 
 void deleteRecord(FILE *fPtr)
@@ -146,29 +248,26 @@ void deleteRecord(FILE *fPtr)
     unsigned int accountNumber;
     printf("%s", "Enter account number to delete (1-100): ");
     scanf("%d", &accountNumber);
-
     fseek(fPtr, (accountNumber - 1) * sizeof(struct ClientData), SEEK_SET);
-
-    struct ClientData client ;
-
+    struct ClientData client;
     fread(&client, sizeof(struct ClientData), 1, fPtr);
-
-    if(client.accountNumber == 0)
+    if (client.accountNumber == 0)
         printf("Account #%d Does not Exist.\n", accountNumber);
-    else 
+    else
     {
         fseek(fPtr, (accountNumber - 1) * sizeof(struct ClientData), SEEK_SET);
-
         struct ClientData blankClient = {0, "", "", 0.0};
-
         fwrite(&blankClient, sizeof(struct ClientData), 1, fPtr);
     }
+    printf("\n\n\n\t\tDelete The Account successfully");
+    printf("\n\n\t\tPress any key to back to meu");
+    getch();
 }
 
 void newRecord(FILE *fPtr)
 {
     printf("%s", "Enter new account number (1-100): ");
-    unsigned int accountNumber;
+    int accountNumber;
     scanf("%d", &accountNumber);
 
     fseek(fPtr, (accountNumber - 1) * sizeof(struct ClientData), SEEK_SET);
@@ -177,9 +276,9 @@ void newRecord(FILE *fPtr)
 
     fread(&client, sizeof(struct ClientData), 1, fPtr);
 
-    if(client.accountNumber != 0)
+    if (client.accountNumber != 0)
         printf("Account #%d already contains information.\n", client.accountNumber);
-    else 
+    else
     {
         printf("%s", "Enter lastname, firstname, balance\n? ");
         scanf("%s%s%lf", client.lastName, client.firstName, &client.balance);
@@ -190,7 +289,9 @@ void newRecord(FILE *fPtr)
 
         fwrite(&client, sizeof(struct ClientData), 1, fPtr);
     }
-    
+    printf("\n\n\n\t\t\tNew Account added successfully");
+    printf("\n\n\t\tPress any key to back to meu");
+    getch();
 }
 
 void clearScreen()
