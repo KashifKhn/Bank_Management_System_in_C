@@ -22,23 +22,20 @@ struct ClientData
 void welcomeScreen(FILE *cfPtr);
 void mainMenu(FILE *cfPtr);
 void adminPanle(FILE *cfPtr);
-bool checkAdminCredentials(FILE *cfPtr);
-void adminRegister(FILE *cfPtr);
+void checkAdminCredentials(FILE *cfPtr);
 void updateAdminCredentials(FILE *cfPtr);
-void deleteAdminCredentials(FILE *cfPtr);
 void viewAllAdminCredentials(FILE *cfPtr);
 void UserPanle(FILE *cfPtr);
-void loginScreen(FILE *cfPtr);
-bool checkCredentials(FILE *cfPtr);
+void checkUserCredentials(FILE *cfPtr);
 void showMenu(FILE *cfPtr);
 void textFile(FILE *readPtr);
-void updateRecord(FILE *fPtr);
+void updateUserCredentials(FILE *fPtr);
 int updatRecordMenu(FILE *cfPtr);
 void amountWithdraw(FILE *fPtr);
 void amountDeposit(FILE *fPtr);
-void newRecord(FILE *fPtr);
-void deleteRecord(FILE *fPtr);
-void viewAllRecord(FILE *fPtr);
+void addNewUserAccount(FILE *fPtr);
+void deleteUserAccount(FILE *fPtr);
+void viewAllUserRecords(FILE *fPtr);
 void clearScreen();
 void exitApp();
 
@@ -96,86 +93,80 @@ void mainMenu(FILE *cfPtr)
     if (option == 1)
         UserPanle(cfPtr);
     if (option == 2)
-        adminPanle(cfPtr);
+        checkAdminCredentials(cfPtr);
     mainMenu(cfPtr);
 }
 
 void adminPanle(FILE *cfPtr)
 {
-    if (checkAdminCredentials(cfPtr))
+    clearScreen();
+    FILE *adPtr;
+    if ((adPtr = fopen("adminCredentials.dat", "rb+")) == NULL)
+        puts("File could not Opened");
+    else
     {
         clearScreen();
-        FILE *adPtr;
-        if ((adPtr = fopen("adminCredentials.dat", "rb+")) == NULL)
-            puts("File could not Opened");
-        else
+        printf("\t\t################################################################\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#               -------------------------                      #\n");
+        printf("\t\t#               |     Admin Panle Menu  |                      #\n");
+        printf("\t\t#               -------------------------                      #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                      Press                                   #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                 -->  1 To Update Admin detail                #\n");
+        printf("\t\t#                 -->  2 To View Admin                         #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                 -->  3 To Add New User Account               #\n");
+        printf("\t\t#                 -->  4 To Delete User Account                #\n");
+        printf("\t\t#                 -->  5 To View All User Account              #\n");
+        printf("\t\t#                 -->  6 To Upload User Detail For Print       #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                 -->  9 To MainMenu                           #\n");
+        printf("\t\t#                 -->  0 To Exit                               #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t#                                                              #\n");
+        printf("\t\t################################################################\n");
+        sleep(1);
+        printf("\n");
+        printf("\t\t\t\t--->: ");
+        char option;
+        option = getch();
+        option -= 48;
+        printf("\n\n\n");
+        if (option >= 1 && option <= 7)
         {
-            clearScreen();
-            printf("\t\t################################################################\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#               -----------------------                        #\n");
-            printf("\t\t#               |     Admin Panle     |                        #\n");
-            printf("\t\t#               -----------------------                        #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                      Press                                   #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                 -->  1 To Add new Admin                      #\n");
-            printf("\t\t#                 -->  2 To Update Admin detail                #\n");
-            printf("\t\t#                 -->  3 To Delete Admin                       #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                 -->  4 To Add New User Account               #\n");
-            printf("\t\t#                 -->  5 To Delete User Account                #\n");
-            printf("\t\t#                 -->  6 To View All User Account              #\n");
-            printf("\t\t#                 -->  7 To Upload User Detail For Print       #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                 -->  9 To MainMenu                           #\n");
-            printf("\t\t#                 -->  0 To Exit                               #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t#                                                              #\n");
-            printf("\t\t################################################################\n");
-            sleep(1);
-            printf("\n");
-            printf("\t\t\t\t--->: ");
-            char option;
-            option = getch();
-            option -= 48;
-            printf("\n\n\n");
-            if (option >= 1 && option <= 7)
+            if (option == 1)
+                updateAdminCredentials(cfPtr);
+            else if (option == 2)
+                viewAllAdminCredentials(cfPtr);
+            else if (option == 3)
+                addNewUserAccount(cfPtr);
+            else if (option == 4)
+                deleteUserAccount(cfPtr);
+            else if (option == 5)
+                viewAllUserRecords(cfPtr);
+            else if (option == 6)
             {
-                if (option == 1)
-                    adminRegister(cfPtr);
-                else if (option == 2)
-                    updateAdminCredentials(cfPtr);
-                else if (option == 3)
-                    deleteAdminCredentials(cfPtr);
-                else if (option == 4)
-                    newRecord(cfPtr);
-                else if (option == 5)
-                    deleteRecord(cfPtr);
-                else if (option == 6)
-                    viewAllRecord(cfPtr);
-                else if (option == 7)
-                {
-                    textFile(cfPtr);
-                    printf("\n\n\n\t\t\tUpload Compelet");
-                    printf("\n\n\t\tPress any key to back to meu");
-                    getch();
-                }
+                textFile(cfPtr);
+                printf("\n\n\n\t\t\tUpload Compelet");
+                printf("\n\n\t\tPress any key to back to meu");
+                getch();
             }
-            else if (option == 9)
-                mainMenu(cfPtr);
-            else if (option == 0)
-            {
-                exitApp();
-                fclose(cfPtr);
-            }
-            adminPanle(cfPtr);
         }
+        else if (option == 9)
+            mainMenu(cfPtr);
+        else if (option == 0)
+        {
+            exitApp();
+            fclose(cfPtr);
+        }
+        adminPanle(cfPtr);
     }
 }
 
-bool checkAdminCredentials(FILE *cfPtr)
+void checkAdminCredentials(FILE *cfPtr)
 {
     clearScreen();
     printf("\t\t###################################################\n");
@@ -202,9 +193,7 @@ bool checkAdminCredentials(FILE *cfPtr)
         struct AdminData admin = {"", ""};
         fread(&admin, sizeof(struct AdminData), 1, adPtr);
         if (strcmp(admin.userName, userName) == 0 && strcmp(admin.Password, Password) == 0)
-        {
-            return true;
-        }
+            adminPanle(cfPtr);
         else
         {
             printf("\n\n\n\t\t\tInvalid Credentials");
@@ -237,13 +226,13 @@ void viewAllAdminCredentials(FILE *cfPtr)
     getch();
 }
 
-void adminRegister(FILE *cfPtr)
+void updateAdminCredentials(FILE *cfPtr)
 {
     clearScreen();
     printf("\t\t###################################################\n");
     printf("\t\t#                                                 #\n");
     printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#               |     Admin Register  |           #\n");
+    printf("\t\t#               |     Admin Update    |           #\n");
     printf("\t\t#               -----------------------           #\n");
     printf("\t\t#                                                 #\n");
     printf("\t\t###################################################\n");
@@ -258,17 +247,28 @@ void adminRegister(FILE *cfPtr)
         char Password[20];
         printf("%s", "\t\tEnter User Name: ");
         scanf("%s", userName);
-        printf("\n\t\tEnter Password: ");
+        printf("\n\t\tEnter New Password: ");
         scanf("%s", Password);
+        char temp[20];
+        strcpy(temp, Password);
+        printf("\n\t\tEnter  Password Again: ");
+        scanf("%s", Password);
+        if (strcmp(temp, Password) != 0)
+        {
+            printf("\n\n\n\t\t\tInvalid Password");
+            printf("\n\n\t\tPress any key to back to meu");
+            getch();
+            updateAdminCredentials(cfPtr);
+        }
         fseek(adPtr, 0, SEEK_SET);
         struct AdminData admin = {"", ""};
         fread(&admin, sizeof(struct AdminData), 1, adPtr);
-        if (strcmp(admin.userName, userName) == 0)
+        if (strcmp(admin.Password, Password) == 0)
         {
-            printf("\n\n\n\t\t\tUser Name Already Exist");
+            printf("\n\n\n\t\t\tEnter New Password");
             printf("\n\n\t\tPress any key to back to meu");
             getch();
-            adminRegister(cfPtr);
+            updateAdminCredentials(cfPtr);
         }
         else
         {
@@ -277,146 +277,75 @@ void adminRegister(FILE *cfPtr)
             fseek(adPtr, 0, SEEK_SET);
             fwrite(&admin, sizeof(struct AdminData), 1, adPtr);
             fclose(adPtr);
-            printf("\n\n\n\t\t\tRegister Compelet");
+            printf("\n\n\n\t\tUpdate Compelet");
             printf("\n\n\t\tPress any key to back to meu");
             getch();
         }
     }
-}
-
-void updateAdminCredentials(FILE *cfPtr)
-{
-    clearScreen();
-    printf("\t\t###################################################\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#               |     Update Admin     |          #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t###################################################\n");
-    sleep(1);
-    printf("\n");
-    FILE *adPtr;
-    if ((adPtr = fopen("adminCredentials.dat", "rb+")) == NULL)
-        puts("File could not Opened");
-    else
-    {
-        char userName[20];
-        char Password[20];
-        printf("%s", "\t\tEnter User Name: ");
-        scanf("%s", userName);
-        printf("\n\t\tEnter Password: ");
-        scanf("%s", Password);
-        fseek(adPtr, 0, SEEK_SET);
-        struct AdminData admin = {"", ""};
-        fread(&admin, sizeof(struct AdminData), 1, adPtr);
-        if (strcmp(admin.userName, userName) == 0 && strcmp(admin.Password, Password) == 0)
-        {
-            printf("\n\n\n\t\t\tUser Name Already Exist");
-            printf("\n\n\t\tPress any key to back");
-            getch();
-            adminRegister(cfPtr);
-        }
-        else
-        {
-            strcpy(admin.userName, userName);
-            strcpy(admin.Password, Password);
-            fseek(adPtr, 0, SEEK_SET);
-            fwrite(&admin, sizeof(struct AdminData), 1, adPtr);
-            printf("\n\n\n\t\t\tUpdate Compelet");
-            printf("\n\n\t\tPress any key to back to meu");
-            getch();
-        }
-    }
-}
-
-void deleteAdminCredentials(FILE *cfPtr)
-{
-    clearScreen();
-    printf("\t\t###################################################\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#               |     Delete Admin     |           #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t###################################################\n");
-    sleep(1);
-    printf("\n");
-    FILE *adPtr;
-    if ((adPtr = fopen("adminCredentials.dat", "rb+")) == NULL)
-        puts("File could not Opened");
-    else
-    {
-        char userName[20];
-        char Password[20];
-        printf("%s", "\t\tEnter User Name: ");
-        scanf("%s", userName);
-        printf("\n\t\tEnter Password: ");
-        scanf("%s", Password);
-        fseek(adPtr, 0, SEEK_SET);
-        struct AdminData admin = {"", ""};
-        fread(&admin, sizeof(struct AdminData), 1, adPtr);
-        if (strcmp(admin.userName, userName) == 0 && strcmp(admin.Password, Password) == 0)
-        {
-            strcpy(admin.userName, "");
-            strcpy(admin.Password, "");
-            fseek(adPtr, 0, SEEK_SET);
-            fwrite(&admin, sizeof(struct AdminData), 1, adPtr);
-            printf("\n\n\n\t\t\tDelete Compelet");
-            printf("\n\n\t\tPress any key to back to meu");
-            getch();
-        }
-        else
-        {
-            printf("\n\n\n\t\t\tInvalid Credentials");
-            printf("\n\n\t\tPress any key to back to meu");
-            getch();
-        }
-    }
-    fclose(adPtr);
-    adminPanle(cfPtr);
 }
 
 void UserPanle(FILE *cfPtr)
 {
-    checkCredentials(cfPtr);
     clearScreen();
-    printf("\t\t###################################################\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#               |      User Panle     |           #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t###################################################\n");
-    sleep(1);
-}
-
-void loginScreen(FILE *cfPtr)
-{
-    clearScreen();
-    printf("\t\t###################################################\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#               |    Login Screen     |           #\n");
-    printf("\t\t#               -----------------------           #\n");
-    printf("\t\t#                                                 #\n");
-    printf("\t\t###################################################\n");
+    printf("\t\t################################################################\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#               -------------------------                      #\n");
+    printf("\t\t#               |     User Panle Menu   |                      #\n");
+    printf("\t\t#               -------------------------                      #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                      Press                                   #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  1 To Deposite Money                     #\n");
+    printf("\t\t#                 -->  2 To withdraw Money                     #\n");
+    printf("\t\t#                 -->  3 Update an Account                     #\n");
+    printf("\t\t#                 -->  4 To Delete an Account                  #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                 -->  9 To MainMenu                           #\n");
+    printf("\t\t#                 -->  0 To Exit                               #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t#                                                              #\n");
+    printf("\t\t################################################################\n");
     sleep(1);
     printf("\n");
-    if (checkCredentials(cfPtr))
-        showMenu(cfPtr);
-    else
+    printf("\t\t\t\t--->: ");
+    char option;
+    option = getch();
+    option -= 48;
+    printf("\n\n\n");
+    if (option >= 1 && option <= 4)
     {
-        printf("\n\n\n\t\t\tInvalid Credentials");
-        printf("\n\n\t\tPress any key to back to meu");
-        getch();
-        loginScreen(cfPtr);
+        if (option == 1)
+            amountDeposit(cfPtr);
+        else if (option == 2)
+            amountWithdraw(cfPtr);
+        else if (option == 3)
+            updateUserCredentials(cfPtr);
+        else if (option == 4)
+            deleteUserAccount(cfPtr);
     }
+    else if (option == 9)
+        mainMenu(cfPtr);
+    else if (option == 0)
+    {
+        exitApp();
+        fclose(cfPtr);
+    }
+    UserPanle(cfPtr);
 }
 
-bool checkCredentials(FILE *cfPtr)
+void checkUserCredentials(FILE *cfPtr)
 {
+    clearScreen();
+    printf("\t\t#####################################################\n");
+    printf("\t\t#                                                   #\n");
+    printf("\t\t#               ---------------------               #\n");
+    printf("\t\t#               |   User Login      |               #\n");
+    printf("\t\t#               ---------------------               #\n");
+    printf("\t\t#                                                   #\n");
+    printf("\t\t#####################################################\n");
+    sleep(1);
+    printf("\n");
     if ((cfPtr = fopen("account.dat", "rb+")) == NULL)
         puts("File could not Opened");
     else
@@ -431,9 +360,14 @@ bool checkCredentials(FILE *cfPtr)
         struct ClientData client = {0, "", "", 0.0, 0};
         fread(&client, sizeof(struct ClientData), 1, cfPtr);
         if (client.accountNumber != 0 && client.pinCode == pinCode)
-            return true;
+            showMenu(cfPtr);
         else
-            return false;
+        {
+            printf("\n\n\n\t\t\tInvalid Credentials");
+            printf("\n\n\t\tPress any key to back to meu");
+            getch();
+            mainMenu(cfPtr);
+        }
     }
 }
 
@@ -443,14 +377,15 @@ void showMenu(FILE *cfPtr)
     printf("\t\t################################################################\n");
     printf("\t\t#                                                              #\n");
     printf("\t\t#               -----------------------                        #\n");
-    printf("\t\t#               |      Bank Menu      |                        #\n");
+    printf("\t\t#               |      User Menu      |                        #\n");
     printf("\t\t#               -----------------------                        #\n");
     printf("\t\t#                                                              #\n");
     printf("\t\t#                      Press                                   #\n");
     printf("\t\t#                                                              #\n");
     printf("\t\t#                 -->  1 To Deposite Money                     #\n");
     printf("\t\t#                 -->  2 To withdraw Money                     #\n");
-    printf("\t\t#                 -->  4 Update an Account                     #\n");
+    printf("\t\t#                 -->  3 Update an Account                     #\n");
+    printf("\t\t#                 -->  4 To Delete an Account                  #\n");
     printf("\t\t#                                                              #\n");
     printf("\t\t#                 -->  0 to exit the Program                   #\n");
     printf("\t\t#                                                              #\n");
@@ -469,20 +404,9 @@ void showMenu(FILE *cfPtr)
         else if (option == 2)
             amountWithdraw(cfPtr);
         else if (option == 3)
-            newRecord(cfPtr);
+            updateUserCredentials(cfPtr);
         else if (option == 4)
-            updateRecord(cfPtr);
-        else if (option == 5)
-            deleteRecord(cfPtr);
-        else if (option == 6)
-            viewAllRecord(cfPtr);
-        else if (option == 7)
-        {
-            textFile(cfPtr);
-            printf("\n\n\n\t\t\tUpload Compelet");
-            printf("\n\n\t\tPress any key to back to meu");
-            getch();
-        }
+            deleteUserAccount(cfPtr);
     }
     else if (option == 0)
     {
@@ -492,7 +416,7 @@ void showMenu(FILE *cfPtr)
     showMenu(cfPtr);
 }
 
-void viewAllRecord(FILE *fPtr)
+void viewAllUserRecords(FILE *fPtr)
 {
     textFile(fPtr);
     FILE *viewPtr;
@@ -536,7 +460,7 @@ void textFile(FILE *readPtr)
     }
 }
 
-void updateRecord(FILE *fPtr)
+void updateUserCredentials(FILE *fPtr)
 {
     unsigned int account;
     printf("%s", "Enter account to update (1-100): ");
@@ -624,12 +548,12 @@ int updatRecordMenu(FILE *cfPtr)
     if (option >= 1 && option <= 3)
         return (int)option;
     else if (option == 4)
-        viewAllRecord(cfPtr);
+        viewAllUserRecords(cfPtr);
     else if (option == 0)
         showMenu(cfPtr);
 }
 
-void deleteRecord(FILE *fPtr)
+void deleteUserAccount(FILE *fPtr)
 {
     // checkCredentials(fPtr);
     unsigned int accountNumber;
@@ -651,7 +575,7 @@ void deleteRecord(FILE *fPtr)
     getch();
 }
 
-void newRecord(FILE *fPtr)
+void addNewUserAccount(FILE *fPtr)
 {
     printf("%s", "Enter new account number (1-100): ");
     int accountNumber;
